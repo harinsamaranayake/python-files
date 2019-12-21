@@ -42,7 +42,7 @@ edges=cv2.GaussianBlur(edges,(3,3),sigmaX=2.0,sigmaY=2.0)
 # The value is chosen in order to get a single high accumulator.
 # The threshold eliminates low accumulators
 # result = hough_ellipse(edges, accuracy=20, threshold=250,min_size=100, max_size=120)
-result = hough_ellipse(edges, accuracy=1, threshold=150,min_size=1, max_size=270)
+result = hough_ellipse(edges, threshold=150, accuracy=20, min_size=1, max_size=270)
 result.sort(order='accumulator')
 
 # Estimated parameters for the ellipse
