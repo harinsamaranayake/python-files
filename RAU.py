@@ -1,3 +1,7 @@
+import numpy as np
+import cv2
+import os
+
 def RA_unit(x, h, w, n):
     print("h and n :",h,n)
     # x-input, h-height, w-width, n-slice count
@@ -15,3 +19,8 @@ def RA_unit(x, h, w, n):
     	x_t = tf.concat([x_t, x_t_3], axis=3) # staking to get I`-X`
     x_out = tf.concat([x, x_t], axis=3)# D`
     return x_out , x_2
+
+if __name__ == "__main__":
+    image_name="DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
+    image_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
+    pass

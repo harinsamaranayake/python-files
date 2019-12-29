@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 
-video_name="DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
+video_name= "DJI_0010.MOV" #"DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
 video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
 
 cap = cv2.VideoCapture(video_path)
