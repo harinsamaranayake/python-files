@@ -17,7 +17,7 @@ def kde_scipy( vals1, vals2, a, b, c, d, xN,yN ):
     x=np.linspace(a,b,xN)
     y=np.linspace(c,d,yN)
     X,Y=np.meshgrid(x,y)
-    positions = np.vstack([Y.ravel(), X.ravel()])
+    positions = np.vstack([X.ravel(), Y.ravel()])
 
     values = np.vstack([vals1, vals2])
     kernel = st.gaussian_kde(values)
@@ -63,8 +63,8 @@ levels = np.linspace(0, Z.max(), 10)
 # ax[1].contourf(x, y, Z, levels=levels, cmap='Purples')
 # ax[0].imshow(img)
 
-plot.scatter(vals1, vals2, s=10, c='red', marker='o')
-# plot.contourf(x, y, Z, levels=levels, cmap='Purples')
+# plot.scatter(vals1, vals2, s=10, c='red', marker='o')
+plot.contourf(x, y, Z, levels=levels, cmap='Purples')
 
 # plot.axis('equal')
 plot.axis('scaled')
