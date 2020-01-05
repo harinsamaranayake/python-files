@@ -21,7 +21,8 @@ if type(circles) is np.ndarray:
     circles_xy = circles_xyr[:, 0:2]
     circles_x = circles_xyr[:, 0:1]
     circles_y = circles_xyr[:, 1:2]
-    print(circles_xy)
+    circles_z = circles_xyr[:, 2:3]
+    # print(circles_xy)
 
 # data = np.random.multivariate_normal((0, 0), [[0.8, 0.05], [0.05, 0.7]], 100)
 # x = data[:, 0]
@@ -31,9 +32,11 @@ if type(circles) is np.ndarray:
 
 x = circles_x.ravel()
 y = circles_y.ravel()
+w = circles_z.ravel()
+
 xmin, xmax = 0, img.shape[1]
 ymin, ymax = 0, img.shape[0]
-# print(x,y,xmax,ymax)
+print(w)
 
 # Peform the kernel density estimate
 # xx, yy = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
@@ -45,7 +48,10 @@ ymin, ymax = 0, img.shape[0]
 xx, yy = np.mgrid[xmin:xmax:1, ymin:ymax:1]
 positions = np.vstack([xx.ravel(), yy.ravel()])
 values = np.vstack([x, y])
-kernel = st.gaussian_kde(values)
+
+# kernel = st.gaussian_kde(dataset=values,bw_method=None,weights=None)
+kernel = st.gaussian_kde(dataset=values,bw_method='silverman',weights=w) # scott silverman scalar(0.2)
+
 f = np.reshape(kernel(positions).T, xx.shape)
 print(f.shape)
 
@@ -58,13 +64,13 @@ ax.set_ylim(ymin, ymax)
 cfset = ax.contourf(xx, yy, f, cmap='Blues')
 
 # Contour plot | Lines
-cset = ax.contour(xx, yy, f, colors='k')
+# cset = ax.contour(xx, yy, f, colors='k')
 
-## Or kernel density estimate plot instead of the contourf plot
+# Or kernel density estimate plot instead of the contourf plot
 # ax.imshow(np.rot90(f), cmap='Blues', extent=[xmin, xmax, ymin, ymax])
 
 # Label plot
-ax.clabel(cset, inline=10, fontsize=10)
+# ax.clabel(cset, inline=10, fontsize=10)
 
 ax.set_xlabel('Y')
 ax.set_ylabel('X')

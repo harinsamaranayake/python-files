@@ -47,6 +47,7 @@ def view_dense_potical_flow(video_path=None):
         hsv[...,2] = cv.normalize(mag,None,0,255,cv.NORM_MINMAX)
 
         bgr = cv.cvtColor(hsv,cv.COLOR_HSV2BGR)
+        bgr = cv.cvtColor(hsv,cv.COLOR_BGR2GRAY)
 
         cv.imshow('frame',frame2)
         cv.imshow('bgr',bgr)
@@ -67,6 +68,7 @@ def view_dense_potical_flow(video_path=None):
         # cv.imshow('gray',gray)
         
         k = cv.waitKey(1) & 0xff
+
         if k == 27:
             break
         elif k == ord('q'):

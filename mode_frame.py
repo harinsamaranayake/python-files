@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from scipy import stats
 
-video_name="DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
+video_name="DJI_0011.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
 video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
 
 cap = cv2.VideoCapture(video_path)
@@ -73,10 +73,10 @@ for start_frame in range(total_frames):
     cv2.imshow('diff_mode_frame_norm',diff_mode_frame_norm)
 
     heatmap = cv2.applyColorMap(diff_mode_frame_norm, cv2.COLORMAP_JET)
-    cv2.imshow('heat_map',heatmap)
+    # cv2.imshow('heat_map',heatmap)
     
-    cv2.waitKey(0)
-    break
+    if cv2.waitKey(0) & 0xFF == ord('q'):
+        break
 
 print('done')
 

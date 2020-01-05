@@ -261,13 +261,13 @@ def display_video(video_path=None,frame_rate=30, seconds_to_skip=0):
         ret, frame = cap.read()
 
         if ret:
-            img, cimg_map, cimg_map_norm, heat_map = display_image_m2(1, frame)
+            img, cimg_map, cimg_map_norm, heat_map = display_image_m1(1, frame)
             frame_array.append(heat_map)
             
-            # cv2.imshow('input', img)
-            # cv2.imshow('cimg_map_maen', cimg_map)
-            # cv2.imshow('cimg_map_norm', cimg_map_norm)
-            # cv2.imshow('heat_map', heat_map)
+            cv2.imshow('input', img)
+            cv2.imshow('cimg_map_maen', cimg_map)
+            cv2.imshow('cimg_map_norm', cimg_map_norm)
+            cv2.imshow('heat_map', heat_map)
             # cv2.waitKey(0)
 
             # cv2.imwrite('/Users/harinsamaranayake/Desktop/original.png',img)
@@ -281,7 +281,7 @@ def display_video(video_path=None,frame_rate=30, seconds_to_skip=0):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-        break
+        # break
 
 
 def get_video():
@@ -332,7 +332,7 @@ if __name__ == "__main__":
     video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
     img_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_02/set_02_color/DJI_0004_00000000.png"
     
-    display_image_m3_kde(flag=0)
-    # display_video(video_path=video_path,frame_rate=30, seconds_to_skip=0)
+    # display_image_m3_kde(flag=0)
+    display_video(video_path=video_path,frame_rate=30, seconds_to_skip=0)
     # get_video()
     print('done!')
