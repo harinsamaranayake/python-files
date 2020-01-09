@@ -227,12 +227,6 @@ def display_image_m3_kde(flag=0, frame=None):
         kde = KernelDensity(bandwidth=1.0, kernel='gaussian')
         kde.fit()
 
-            
-
-            
-
-        
-
     if (flag == 0):
         # image
         image_type = original

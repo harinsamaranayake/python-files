@@ -45,9 +45,9 @@ def RA_unit(x, h, w, n):
         print('x_t_2\n',x_t_2[0],'\n')
         # print('x\n',x[0],'\n')
 
-        cv2.imshow('x_t_2', x_t_2[0])
-        cv2.imshow('x', x[0])
-        cv2.waitKey(0)
+        # cv2.imshow('x_t_2', x_t_2[0])
+        # cv2.imshow('x', x[0])
+        # cv2.waitKey(0)
 
         # print('x_t_1\t',np.shape(x_t_1))
         # print('x_t_2\t',np.shape(x_t_2))

@@ -3,6 +3,9 @@
 import numpy as np
 import cv2 as cv
 import skfuzzy as fuzz
+import cv2
+from scipy.cluster.hierarchy import dendrogram, linkage
+from matplotlib import pyplot as plt
 
 def skip_frames(cap,frame_rate,seconds_to_skip):
     # skip frames
@@ -73,6 +76,38 @@ def get_fuzz_img(frame=None):
 
     return org_img,fuzzy_img,seg_img
 
+def get_dendrogram(image=None, resize_factor=0.3):
+    img = image.copy()
+    img = cv2.resize(img, (int(img.shape[1] * resize_factor), int(img.shape[0] * resize_factor))) 
+    print(img.shape)
+    #Note : 3 channels (108, 192, 3) 20736 if doubled RecursionError: maximum recursion depth exceeded while getting the str of an object
+    #Note : 1 channels (108, 192, 3) 20736 if doubled RecursionError: maximum recursion depth exceeded while getting the str of an object
+    #Note : cv2.imshow displays a RGB image. HSV channel VALUES are considered as RGB VALUES and displayed
+    
+    # img_disp = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
+    # cv.imshow('test_img', img_disp)
+    # cv2.waitKey(0)
+
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = img[:, :, 0:3]
+    img = img.reshape((img.shape[0] * img.shape[1], 3))
+
+    print(img)
+    print(img.shape)
+
+    linked = linkage(img, 'average')
+
+    plt.figure(figsize=(15, 7))
+
+    dendrogram(linked,
+            orientation='top',
+            distance_sort='descending',
+            show_leaf_counts=False)
+
+    plt.show()
+
+    print('done')
+
 def view_dense_potical_flow(video_path=None,seconds_to_skip=0,resize_factor=1):
     cap = cv.VideoCapture(cv.samples.findFile(video_path))
     cap = skip_frames(cap=cap,frame_rate=30,seconds_to_skip=seconds_to_skip)
@@ -107,6 +142,10 @@ def view_dense_potical_flow(video_path=None,seconds_to_skip=0,resize_factor=1):
 
         bgr = cv.cvtColor(hsv,cv.COLOR_HSV2BGR)
 
+        print('getting dendrogram')
+        get_dendrogram(image = hsv)
+        break
+
         # below two outputs the same image. difference is no of channels
         # bgr = cv.cvtColor(bgr,cv.COLOR_BGR2GRAY)
         # bgr = cv.cvtColor(bgr,cv.COLOR_GRAY2BGR)
@@ -117,10 +156,11 @@ def view_dense_potical_flow(video_path=None,seconds_to_skip=0,resize_factor=1):
         org_img,fuzzy_img,seg_img = get_fuzz_img(max_img)
 
         # cv.imshow('max',max_img)
-        cv.imshow('frame',frame2)
+        # cv.imshow('frame',frame2)
         # cv.imshow('bgr',bgr)
-        cv.imshow('fuzzy_img',fuzzy_img)
-        # cv.imshow('seg_img',seg_img)
+        # cv.imshow('fuzzy_img',fuzzy_img)
+        cv.imshow('hsv',hsv[:,:,0])
+        cv.imshow('seg_img',seg_img)
         
         # mag=cv.normalize(mag,None,0,255,cv.NORM_MINMAX)
         # ang=ang*180/np.pi/2
@@ -150,9 +190,11 @@ def view_dense_potical_flow(video_path=None,seconds_to_skip=0,resize_factor=1):
             pass
 
         prvs = next
+    
+    cap.release()
 
 if __name__ == "__main__":
     video_name= "DJI_0004.MOV" #"DJI_0112_S_1.MOV" #"DJI_0002_S_1.MOV" #"DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
     video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
-    view_dense_potical_flow(video_path=video_path,seconds_to_skip=0,resize_factor=4)
+    view_dense_potical_flow(video_path=video_path,seconds_to_skip=0,resize_factor=2)
 
