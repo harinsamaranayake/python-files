@@ -2,10 +2,11 @@
 
 import numpy as np
 import cv2 as cv
+import cv2 
 import skfuzzy as fuzz
-import cv2
 from scipy.cluster.hierarchy import dendrogram, linkage
 from matplotlib import pyplot as plt
+import time
 
 def skip_frames(cap,frame_rate,seconds_to_skip):
     # skip frames
@@ -76,9 +77,9 @@ def get_fuzz_img(frame=None):
 
     return org_img,fuzzy_img,seg_img
 
-def get_dendrogram(image=None, resize_factor=0.3):
+def get_dendrogram(image=None, resize_factor=5):
     img = image.copy()
-    img = cv2.resize(img, (int(img.shape[1] * resize_factor), int(img.shape[0] * resize_factor))) 
+    img = cv2.resize(img, (int(img.shape[1] / resize_factor), int(img.shape[0] / resize_factor))) 
     print(img.shape)
     #Note : 3 channels (108, 192, 3) 20736 if doubled RecursionError: maximum recursion depth exceeded while getting the str of an object
     #Note : 1 channels (108, 192, 3) 20736 if doubled RecursionError: maximum recursion depth exceeded while getting the str of an object
@@ -91,9 +92,14 @@ def get_dendrogram(image=None, resize_factor=0.3):
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = img[:, :, 0:3]
     img = img.reshape((img.shape[0] * img.shape[1], 3))
+    # img = img[:, :, 0:1]
+    # img = img.reshape((img.shape[0] * img.shape[1], 1))
 
     print(img)
     print(img.shape)
+    print("Plotting Dendogram")
+
+    start_time = time.time()
 
     linked = linkage(img, 'average')
 
@@ -101,8 +107,10 @@ def get_dendrogram(image=None, resize_factor=0.3):
 
     dendrogram(linked,
             orientation='top',
-            distance_sort='descending',
+            distance_sort='True',
             show_leaf_counts=False)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     plt.show()
 
@@ -142,9 +150,9 @@ def view_dense_potical_flow(video_path=None,seconds_to_skip=0,resize_factor=1):
 
         bgr = cv.cvtColor(hsv,cv.COLOR_HSV2BGR)
 
-        print('getting dendrogram')
-        get_dendrogram(image = hsv)
-        break
+        # Obtain dendogram
+        # get_dendrogram(image = hsv)
+        # break
 
         # below two outputs the same image. difference is no of channels
         # bgr = cv.cvtColor(bgr,cv.COLOR_BGR2GRAY)
@@ -156,7 +164,7 @@ def view_dense_potical_flow(video_path=None,seconds_to_skip=0,resize_factor=1):
         org_img,fuzzy_img,seg_img = get_fuzz_img(max_img)
 
         # cv.imshow('max',max_img)
-        # cv.imshow('frame',frame2)
+        cv.imshow('frame',frame2)
         # cv.imshow('bgr',bgr)
         # cv.imshow('fuzzy_img',fuzzy_img)
         cv.imshow('hsv',hsv[:,:,0])
