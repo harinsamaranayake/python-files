@@ -1,3 +1,4 @@
+# https://stackabuse.com/hierarchical-clustering-with-python-and-scikit-learn/
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
