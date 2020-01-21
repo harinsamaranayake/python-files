@@ -436,7 +436,7 @@ def view_dense_potical_flow_M1(video_path=None,seconds_to_skip=0,resize_factor=1
     cap.release()
 
 if __name__ == "__main__":
-    video_name = "DJI_0005.MOV" #"DJI_0112_S_1.MOV" #"DJI_0002_S_1.MOV" #"DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
+    video_name = "DJI_0010.MOV" #"DJI_0112_S_1.MOV" #"DJI_0002_S_1.MOV" #"DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
     video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
-    view_dense_potical_flow_S2(video_path=video_path,seconds_to_skip=17,resize_factor=2)
+    view_dense_potical_flow_S2(video_path=video_path,seconds_to_skip=10,resize_factor=2)
 

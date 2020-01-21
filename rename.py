@@ -1,6 +1,8 @@
 import os
-path='/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_02/set_02_color/'
-arr = os.listdir(path)
+# path='/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_02/set_02_color/'
+path = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_puddle1000_ep100/ '
+
+arr = next(os.walk(path))[2]
 
 if '.DS_Store' in arr:
     arr.remove('.DS_Store')
@@ -15,9 +17,16 @@ if '.DS_Store' in arr:
 #     print(new_name)
 #     # os.rename(old_name,new_name)
 
+# for i in arr:
+#     old_name=i
+#     old_name_part=old_name.split(".")
+#     new_name=old_name_part[0]+".png"
+#     print(i,'\t',old_name,'\t',new_name)
+#     os.rename(path+i,path+new_name)
+
 for i in arr:
-    old_name=i
-    old_name_part=old_name.split(".")
-    new_name=old_name_part[0]+".png"
-    print(i,'\t',old_name,'\t',new_name)
+    old_name = i
+    old_name_part = old_name.split("_")
+    new_name = old_name_part[0]+".png"
+    print(i, '\t', old_name, '\t', new_name)
     os.rename(path+i,path+new_name)

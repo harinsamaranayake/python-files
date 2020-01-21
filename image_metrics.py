@@ -11,8 +11,10 @@ from sklearn.metrics import classification_report
 
 #### CHANGE
 flag_resize_pred=True
-path_pred = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_pred'
-path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask'
+# path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_000_029_ep100'
+# path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/crop/label'
+path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_301_330_ep100'
+path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/crop/label'
 #### END
 
 true_img_list = []
@@ -21,20 +23,20 @@ pred_img_list = []
 true_list_new=[]
 pred_list_new=[]
 
-pred_img_length = 0
-pred_img_width = 0
 true_img_length = 0
 true_img_width = 0
+pred_img_length = 0
+pred_img_width = 0
 
 #### Read from file
 def read_from_file():
     text_file_path='/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask'
     p=np.genfromtxt(text_file_path,dtype='str')
 
+    # obtaining the image sizes
     for i in range(p.shape[0]):
         img = p[i,0]
 
-        # to obtain the image sizes
         pred_img = cv2.imread(path_pred+"/%s" % img)
         true_img = cv2.imread(path_true+"/%s" % img)
 
@@ -49,6 +51,7 @@ def read_from_file():
         
         break
 
+    # resizing to same shape
     for i in range(p.shape[0]):
         # gt imgage name
         img = p[i,0]
@@ -62,8 +65,8 @@ def read_from_file():
             true_img = cv2.resize(true_img, (pred_img_width, pred_img_length))
 
         # Threshold images
-        ret_1,pred_img = cv2.threshold(pred_img,128,255,cv2.THRESH_BINARY)
-        ret_2,true_img = cv2.threshold(true_img,128,255,cv2.THRESH_BINARY)
+        # ret_1,pred_img = cv2.threshold(pred_img,128,255,cv2.THRESH_BINARY)
+        # ret_2,true_img = cv2.threshold(true_img,128,255,cv2.THRESH_BINARY)
 
         true_img_list.append(true_img)
         pred_img_list.append(pred_img)
@@ -84,6 +87,12 @@ if '.DS_Store' in pred_list:
     pred_list.remove('.DS_Store')
 
 for img in pred_list:
+    # Note : to obtain the name of the true mask img
+    # Note : commment if the names of the both files are the same
+    # pred_name = img
+    # mask_name_part = pred_name.split("_")
+    # mask_name = mask_name_part[0]+".png"
+
     # to obtain the image sizes
     pred_img = cv2.imread(path_pred+"/%s" % img)
     true_img = cv2.imread(path_true+"/%s" % img)
@@ -136,7 +145,7 @@ true_list_new = true_list_new.flatten()
 pred_list_new = pred_list_new.flatten()
 
 def confusion_metrics_method_01():
-    print('START > confusion_metrics_method_01')
+    print('\n..........confusion_metrics_method_01..........\n')
 
     tp = 0
     fp = 0
@@ -156,30 +165,32 @@ def confusion_metrics_method_01():
         elif ((pred_value == 0) and (pred_value == true_value)):
             tn += 1
 
-        if ((i % 100000) == 0):
+        if ((i % 1000000) == 0):
             print(i)
 
-    print('tp', tp, '\tfp', fp, '\tfn', fn, '\ttn', tn)
+    print('tp - water detected as water - 255\n')
+    print('tp\t', tp, '\nfp\t', fp, '\nfn\t', fn, '\ntn\t', tn, '\n')
 
     try:
         # water : white
         precision = tp/(tp+fp)
         recall = tp/(tp+fn)
 
-        union_water=tp
-        intersection_water=fn+fp
-        iou_water=union_water/intersection_water
-        print('precision_water', precision, '\t recall_water', recall,'\t iou_water',iou_water)
+        intersection_water=tp
+        union_water=tp + fp + fn
+        iou_water=intersection_water/union_water
+
+        print('precision_water\t\t', precision, '\trecall_water\t', recall,'\tiou_water\t',iou_water,'\n')
 
         # background : black
         precision = tn/(tn+fn)
         recall = tn/(tn+fp)
-        print('precision', precision, '\t', 'recall', recall)
 
-        union_ground=tn
-        intersection_ground=fn+fp
-        iou_ground=union_ground/intersection_ground
-        print('precision_ground', precision, '\t recall_ground', recall,'\t iou_ground',iou_ground)
+        intersection_ground=tn
+        union_ground=tn + fp + fn
+        iou_ground=intersection_ground/union_ground
+
+        print('precision_ground\t', precision, '\trecall_ground\t', recall,'\tiou_ground\t',iou_ground,'\n')
    
     except:
         print('calculation error')
@@ -217,20 +228,24 @@ def scikit_metrix():
     y_pred = pred_list_new
 
     cf = confusion_matrix(y_true, y_pred)
-    print("Confusion Matrix: \n", cf)
+    print("Confusion Matrix: \n\n", cf)
 
     p1 = cf[0, 0]/(cf[0, 0]+cf[0, 1])
     r1 = cf[0, 0]/(cf[0, 0]+cf[1, 0])
     p2 = cf[1, 1]/(cf[1, 1]+cf[1, 0])
     r2 = cf[1, 1]/(cf[1, 1]+cf[0, 1])
-    print('precision-water',p1, '\t recall-water', r1, '\t precision-ground', p2, '\t recall-ground', r2)
 
-    # print("Accuracy : ", accuracy_score(y_true=y_true, y_pred=y_pred)*100)
-    # print("Precision : ", precision_score(y_true=y_true, y_pred=y_pred, pos_label=0)*100)
-    # print("Precision : ", precision_score(y_true=y_true, y_pred=y_pred, pos_label=255)*100)
-    print("Precision : ", precision_score(y_true=y_true, y_pred=y_pred,average='weighted')*100)
-    # print("Recall : ", recall_score(y_true=y_true, y_pred=y_pred, average='weighted')*100)
-    # print("F1_Score : ", f1_score(y_true=y_true, y_pred=y_pred, average='weighted')*100)
+    print('\nprecision-01\t\t',p1, '\nrecall-01\t\t', r1, '\nprecision-02\t\t', p2, '\nrecall-02\t\t', r2, '\n')
+
+    print("Accuracy\t: ", accuracy_score(y_true=y_true, y_pred=y_pred))
+
+    # print("Precision : ", precision_score(y_true=y_true, y_pred=y_pred, pos_label=0))
+    print("Precision\t: ", precision_score(y_true=y_true, y_pred=y_pred, pos_label=255))
+    # print("Precision : ", precision_score(y_true=y_true, y_pred=y_pred,average='weighted'))
+
+    print("Recall\t\t: ", recall_score(y_true=y_true, y_pred=y_pred, pos_label=255))
+    print("F1_Score\t: ", f1_score(y_true=y_true, y_pred=y_pred, pos_label=255),'\n')
+
     print('Classification Report: \n', classification_report(y_true=y_true, y_pred=y_pred))
 
 # def computeIoU(y_pred_batch, y_true_batch):
@@ -244,7 +259,7 @@ def scikit_metrix():
 
 if __name__ == '__main__':
     # read_from_folder()
-    # confusion_metrics_method_01()
+    confusion_metrics_method_01()
     # list_value_finder()
-    # scikit_metrix()
+    scikit_metrix()
     pass

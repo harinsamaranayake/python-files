@@ -24,10 +24,10 @@ def RA_unit(x, h, w, n):
     print('\nx_out\t',np.shape(x_out),'\n')
     print('\nconv\t',np.shape(conv),type(x),'\n')
     print('\nx_in\t',np.shape(x),type(x),'\n')
-    conv_p = tf.Session().run(conv)
+    # conv_p = tf.Session().run(conv)
     # print('\nconv_p\t',conv_p,'\n')
-    # x_p = tf.Session().run(x)
-    # print('\nx_p\t',x_p,'\n')
+    x_p = tf.Session().run(x)
+    print('\nx_p\t',x_p,'\n')
     return conv
 
 def RA_unit_original(x, h, w, n):
@@ -97,7 +97,6 @@ def RA_unit_new(x, h, w, n):
     print('\nx_out\t',np.shape(x_out),'\n')
 
     return x_out
-
 
 if __name__ == "__main__":
     image_name = "img_000000101.png"
