@@ -27,7 +27,7 @@ def kde_scipy( vals1, vals2, a, b, c, d, xN,yN ):
 
     return [x, y, Z]
 
-img_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_02/set_02_color/DJI_0004_00000000.png"
+img_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_03_down/DJI_0004_00000000.png"
 img = cv2.imread(img_path, 1)
 img = cv2.resize(img, (int(img.shape[1]/2), int(img.shape[0]/2)))
 img = cv2.medianBlur(img, 3)

@@ -13,8 +13,8 @@ from sklearn.metrics import classification_report
 flag_resize_pred=True
 # path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_000_029_ep100'
 # path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/crop/label'
-path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_301_330_ep100'
-path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/crop/label'
+# path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_301_330_ep100'
+# path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/crop/label'
 #### END
 
 true_img_list = []
@@ -30,6 +30,12 @@ pred_img_width = 0
 
 #### Read from file
 def read_from_file():
+    true_img_list = []
+    pred_img_list = []
+
+    true_list_new=[]
+    pred_list_new=[]
+
     text_file_path='/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask'
     p=np.genfromtxt(text_file_path,dtype='str')
 
@@ -79,72 +85,91 @@ def read_from_file():
     true_list_new = true_list_new.flatten()
     pred_list_new = pred_list_new.flatten()
 
+    return true_list_new,pred_list_new
+
+
 #### Read from folder
-# true_list = next(os.walk(path_true))[2]
-pred_list = next(os.walk(path_pred))[2]
+def read_from_folder(path_true = None , path_pred = None):
+    print('\n..........read_from_folder..........\n')
 
-if '.DS_Store' in pred_list:
-    pred_list.remove('.DS_Store')
+    flag_resize_pred=True
 
-for img in pred_list:
-    # Note : to obtain the name of the true mask img
-    # Note : commment if the names of the both files are the same
-    # pred_name = img
-    # mask_name_part = pred_name.split("_")
-    # mask_name = mask_name_part[0]+".png"
+    true_img_list = []
+    pred_img_list = []
 
-    # to obtain the image sizes
-    pred_img = cv2.imread(path_pred+"/%s" % img)
-    true_img = cv2.imread(path_true+"/%s" % img)
+    true_list_new=[]
+    pred_list_new=[]
 
-    print('pred_img',pred_img.shape)
-    print('true_img',true_img.shape)
+    # true_list = next(os.walk(path_true))[2]
+    pred_list = next(os.walk(path_pred))[2]
 
-    pred_img_length = pred_img.shape[0]
-    pred_img_width = pred_img.shape[1]
-    true_img_length = true_img.shape[0]
-    true_img_width = true_img.shape[1]
-    # print(pred_img_length, pred_img_width, true_img_length, true_img_width)
-    
-    break
+    if '.DS_Store' in pred_list:
+        pred_list.remove('.DS_Store')
 
-for img in pred_list:
-    #to obtain all predicted and gt images
-    pred_img = cv2.imread(path_pred+"/%s" % img)
-    true_img = cv2.imread(path_true+"/%s" % img)
+    # to print sizes of gt and predicted images
+    for img in pred_list:
+        # Note : to obtain the name of the true mask img
+        # Note : commment if the names of the both files are the same
+        # pred_name = img
+        # mask_name_part = pred_name.split("_")
+        # mask_name = mask_name_part[0]+".png"
 
-    # Making the both images same size
-    if (flag_resize_pred):
-        pred_img = cv2.resize(pred_img, (true_img_width, true_img_length))
-    else:
-        true_img = cv2.resize(true_img, (pred_img_width, pred_img_length))
+        # obtain the image sizes
+        true_img = cv2.imread(path_true+"/%s" % img)
+        pred_img = cv2.imread(path_pred+"/%s" % img)
 
-    # Threshold images
-    ret_1,pred_img = cv2.threshold(pred_img,128,255,cv2.THRESH_BINARY)
-    ret_2,true_img = cv2.threshold(true_img,128,255,cv2.THRESH_BINARY)
+        print('true_img',true_img.shape)
+        print('pred_img',pred_img.shape)
+        
+        true_img_length = true_img.shape[0]
+        true_img_width = true_img.shape[1]
+        pred_img_length = pred_img.shape[0]
+        pred_img_width = pred_img.shape[1]
+        
+        # print(true_img_length, true_img_width, pred_img_length, pred_img_width)
+        
+        break
 
-    # View images
-    # cv2.imshow('p',pred_img)
-    # cv2.imshow('t',true_img)
-    # cv2.waitKey(0)
+    # to obtain all gt and predicted images
+    for img in pred_list:
+        true_img = cv2.imread(path_true+"/%s" % img)
+        pred_img = cv2.imread(path_pred+"/%s" % img)
 
-    # pred_img=np.array(pred_img)
-    # true_img=np.array(true_img)
-    # pred_img=pred_img.flatten()
-    # true_img=true_img.flatten()
+        # Making the both images same size
+        if (flag_resize_pred):
+            # resizing the predicted image to match the size of gt image 
+            pred_img = cv2.resize(pred_img, (true_img_width, true_img_length))
+        else:
+            true_img = cv2.resize(true_img, (pred_img_width, pred_img_length))
 
-    true_img_list.append(true_img)
-    pred_img_list.append(pred_img)
+        # Threshold images
+        ret_2,true_img = cv2.threshold(true_img,127,255,cv2.THRESH_BINARY)
+        ret_1,pred_img = cv2.threshold(pred_img,127,255,cv2.THRESH_BINARY)
 
-#converting to numpy arrays
-true_list_new = np.array(true_img_list)
-pred_list_new = np.array(pred_img_list)
+        # View images
+        # cv2.imshow('true_img',true_img)
+        # cv2.imshow('pred_img',pred_img)
+        # cv2.waitKey(0)
 
-#flatterning the arrays
-true_list_new = true_list_new.flatten()
-pred_list_new = pred_list_new.flatten()
+        # true_img=np.array(true_img)
+        # pred_img=np.array(pred_img)
+        # true_img=true_img.flatten()
+        # pred_img=pred_img.flatten()
+        
+        true_img_list.append(true_img)
+        pred_img_list.append(pred_img)
 
-def confusion_metrics_method_01():
+    #converting to numpy arrays
+    true_list_new = np.array(true_img_list)
+    pred_list_new = np.array(pred_img_list)
+
+    #flatterning the arrays
+    true_list_new = true_list_new.flatten()
+    pred_list_new = pred_list_new.flatten()
+
+    return true_list_new,pred_list_new
+
+def confusion_metrics_method_01(true_list_new = None,pred_list_new = None):
     print('\n..........confusion_metrics_method_01..........\n')
 
     tp = 0
@@ -195,9 +220,6 @@ def confusion_metrics_method_01():
     except:
         print('calculation error')
 
-def confusion_metrics_method_02():
-    pass
-
 def list_value_finder():
     # List value finder. Get different values that exists within a list.
     print('START > List value finder')
@@ -223,7 +245,9 @@ def list_value_finder():
     print(len(true_list_new))
     print(len(pred_list_new))
 
-def scikit_metrix():
+def scikit_metrix(true_list_new = None,pred_list_new = None):
+    print('\n..........scikit_metrix..........\n')
+
     y_true = true_list_new
     y_pred = pred_list_new
 
@@ -248,18 +272,12 @@ def scikit_metrix():
 
     print('Classification Report: \n', classification_report(y_true=y_true, y_pred=y_pred))
 
-# def computeIoU(y_pred_batch, y_true_batch):
-#     return np.mean(np.asarray([pixelAccuracy(y_pred_batch[i], y_true_batch[i]) for i in range(len(y_true_batch))]))
-
-# def pixelAccuracy(y_pred, y_true):
-#     y_pred = np.argmax(np.reshape(y_pred,[N_CLASSES_PASCAL,img_rows,img_cols]),axis=0)
-#     y_true = np.argmax(np.reshape(y_true,[N_CLASSES_PASCAL,img_rows,img_cols]),axis=0)
-#     y_pred = y_pred * (y_true>0)
-#     return 1.0 * np.sum((y_pred==y_true)*(y_true>0)) /  np.sum(y_true>0)
-
 if __name__ == '__main__':
-    # read_from_folder()
-    confusion_metrics_method_01()
+    path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask'
+    path_pred = '/Users/harinsamaranayake/Desktop/Results_Latest/unet-master-new-256/RESULTS/EP100/ONR/'
+
+    true_list_new,pred_list_new = read_from_folder(path_true = path_true , path_pred = path_pred)
+    confusion_metrics_method_01(true_list_new = true_list_new,pred_list_new = pred_list_new)
+    scikit_metrix(true_list_new = true_list_new,pred_list_new = pred_list_new)
     # list_value_finder()
-    scikit_metrix()
     pass

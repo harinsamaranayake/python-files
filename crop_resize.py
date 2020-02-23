@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import os
 
+color_name_list = []
+
 def get_cropped_images(path_color=None, path_mask=None):
     path_color = path_color
     path_mask = path_mask
@@ -111,7 +113,7 @@ def get_cropped_images(path_color=None, path_mask=None):
     color_img_array = np.array(color_img_list)
     mask_img_array = np.array(mask_img_list)
 
-    return color_img_array,
+    return color_img_array,mask_img_array
 
 
 def get_resized_images(path_color=None, path_mask=None):
@@ -121,6 +123,7 @@ def get_resized_images(path_color=None, path_mask=None):
     print('paths:\t', path_color, '\t', path_mask)
 
     # File name at [2]
+    global color_name_list
     color_name_list = next(os.walk(path_color))[2]
 
     # Remove '.DS_Store'
@@ -135,7 +138,7 @@ def get_resized_images(path_color=None, path_mask=None):
 
     for name in color_name_list:
         # to obtain predicted and gt images 0 - gray | 1 - color
-        color_img = cv2.imread(path_color+"/%s" % name)
+        color_img = cv2.imread(path_color+"/%s" % name,0)
         mask_img = cv2.imread(path_mask+"/%s" % name)
 
         # Matching both the color and the mask images | 0-height 1-width
@@ -172,12 +175,13 @@ def get_resized_images(path_color=None, path_mask=None):
 def save_image(img=None, img_name=None, save_path=None):
     # if img is an image array
     for i in range(img.shape[0]):
-        save_as = save_path + str(i) + ".png"
-        # print(save_as)
+        save_as = save_path + '/' + color_name_list[i]
+        print(save_as)
         # print(img[i].shape)
         # cv2.imshow('test',img[i])
         # cv2.waitKey(0)
-        cv2.imwrite(save_path, img[i])
+        cv2.imwrite(save_as, img[i])
+        # break
 
     # if img is an simgle image
     # save_path =  ave_path + "/" + img_name + ".png"
@@ -185,13 +189,16 @@ def save_image(img=None, img_name=None, save_path=None):
 
 
 if __name__ == "__main__":
-    path_color = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/original/color/on_road'
-    path_mask = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/original/mask/on_road'
-    save_path = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/original/color/on_road/'
+    path_color = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_color'
+    path_mask = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask'
+
+    save_path_color = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_color_resize'
+    save_path_mask = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask_resize'
 
     # color_img_array, mask_img_array = get_cropped_images(path_color=path_color,path_mask = path_mask)
     color_img_array, mask_img_array = get_resized_images(path_color=path_color,path_mask = path_mask)
-
+    
     print(color_img_array.shape,mask_img_array.shape)
 
-    save_image(img=color_img_array,save_path=save_path)
+    save_image(img=color_img_array,save_path=save_path_color)
+    save_image(img=mask_img_array,save_path=save_path_mask)

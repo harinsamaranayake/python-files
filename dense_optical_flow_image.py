@@ -124,12 +124,27 @@ def display_text_on_frame(frame = None):
     fontColor              = (255,255,255)
     lineType               = 2
 
-    cv2.putText(frame,'Hello World!', 
+    cv2.putText(frame,'Water Detected!', 
         bottomLeftCornerOfText, 
         font, 
         fontScale,
         fontColor,
         lineType)
+
+def draw_label(img, text, pos, bg_color):
+    font_face = cv2.FONT_HERSHEY_SIMPLEX
+    scale = 0.4
+    color = (0, 0, 0)
+    thickness = cv2.FILLED
+    margin = 2
+
+    txt_size = cv2.getTextSize(text, font_face, scale, thickness)
+
+    end_x = pos[0] + txt_size[0][0] + margin
+    end_y = pos[1] - txt_size[0][1] - margin
+
+    cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
+    cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
 
 
 def view_dense_potical_flow_S1(video_path=None,seconds_to_skip=0,resize_factor=1):
@@ -289,11 +304,13 @@ def view_dense_potical_flow_S2(video_path=None,seconds_to_skip=0,resize_factor=1
         # print(freq2,bins2)
         # print(freq3,bins3)
         # print(freq4,bins4)
-        print(freq5,bins5)
+        print('\n',bins5,freq5)
 
         bin_threshold = 2000
         if(np.amin(freq5[1:])>= bin_threshold ):
             print('8 directions detected with min threshold')
+            # draw_label(frame2, 'Water Detected!', (20,20), (255,255,255))
+            # display_text_on_frame(frame2)
 
         # ret,hsv_seg = cv.threshold(hsv[:,:,2],64,255,cv.THRESH_BINARY)
 
@@ -310,13 +327,18 @@ def view_dense_potical_flow_S2(video_path=None,seconds_to_skip=0,resize_factor=1
         # bgr = cv.cvtColor(bgr,cv.COLOR_GRAY2BGR)
 
         cv2.imshow('frame',frame2)
-        # cv.imshow('next',next)
-        # cv.imshow('hsv',next_hsv[:,:,0])
+        # cv2.imshow('next',next)
+        # cv2.imshow('hsv',hsv)
         cv2.imshow('bgr',bgr)
-        # cv.imshow('max',max_img)
-        # cv.imshow('filtered_angle',filtered_angle)
-        # cv.imshow('fuzzy_img',fuzzy_img)
-        cv2.imshow('seg_img',seg_img)
+        # cv2.imshow('max',max_img)
+        # cv2.imshow('filtered_angle',filtered_angle)
+        # cv2.imshow('fuzzy_img',fuzzy_img)
+        # cv2.imshow('seg_img',seg_img)
+
+        cv2.imwrite('/Users/harinsamaranayake/Desktop/org.png',frame2)
+        cv2.imwrite('/Users/harinsamaranayake/Desktop/bgr.png',bgr)
+        cv2.imwrite('/Users/harinsamaranayake/Desktop/seg.png',seg_img)
+        break
         
         k = cv2.waitKey(1) & 0xff
 
@@ -330,6 +352,8 @@ def view_dense_potical_flow_S2(video_path=None,seconds_to_skip=0,resize_factor=1
         # break
     
     cap.release()
+
+
 
 def view_dense_potical_flow_M1(video_path=None,seconds_to_skip=0,resize_factor=1):
     cap = cv.VideoCapture(cv.samples.findFile(video_path))
@@ -436,7 +460,7 @@ def view_dense_potical_flow_M1(video_path=None,seconds_to_skip=0,resize_factor=1
     cap.release()
 
 if __name__ == "__main__":
-    video_name = "DJI_0010.MOV" #"DJI_0112_S_1.MOV" #"DJI_0002_S_1.MOV" #"DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
-    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/down/"+video_name
-    view_dense_potical_flow_S2(video_path=video_path,seconds_to_skip=10,resize_factor=2)
+    video_name = "DJI_0115.MP4" #"DJI_0112_S_1.MOV" #"DJI_0002_S_1.MOV" #"DJI_0004.MOV" #"DJI_0002_S_1.MOV" #"DJI_0010.MOV"
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/mavic_mini/mavic_mini_stable/stable_water/2_4_m/only_water/"+video_name
+    view_dense_potical_flow_S2(video_path=video_path,seconds_to_skip=0,resize_factor=2)
 
