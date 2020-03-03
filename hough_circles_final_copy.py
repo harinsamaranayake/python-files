@@ -59,19 +59,22 @@ def hough_circles_demo(frame=None, resize_factor=1):
 
     return original, cimg
 
-def save_video():
+def save_video(frame_array=None, fps=0, save_path=None):
     # https://theailearner.com/2018/10/15/creating-video-from-images-using-opencv-python/
     # https://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html
 
-    # out = cv2.VideoWriter(filename='project.avi',fourcc=cv2.VideoWriter_fourcc(*'DIVX'), fps=30, frameSize=100,isColor=1)
-    out = cv2.VideoWriter(filename='/Users/harinsamaranayake/Desktop/result_video.avi', fourcc=cv2.VideoWriter_fourcc(
-        *'DIVX'), fps=30, frameSize=(960, 540), isColor=1)
+    out = cv2.VideoWriter(filename=save_path, fourcc=cv2.VideoWriter_fourcc(
+        *'DIVX'), fps=fps, frameSize=(960, 540), isColor=1)
+
+    frame_array = frame_array
 
     for i in range(len(frame_array)):
         out.write(frame_array[i])
         print('wrote_to_video:\t', i)
 
     out.release()
+
+    print("\nVideo Saved")
 
 def skip_frames(cap,seconds_to_skip):
     # skip frames in a video
@@ -98,87 +101,6 @@ def get_heat_map(img):
     # plt.show()
 
     return heatmap
-
-def display_image_v1_1(frame=None, resize_factor=None):
-    # this algorithm is designed for 540,960 resolution of the frame
-
-    img = None
-    cimg = None
-    original = None
-    resize_factor = resize_factor
-    img = frame
-
-    img = cv2.resize(img, (int(img.shape[1]/resize_factor), int(img.shape[0]/resize_factor)))
-    original = img.copy()
-
-    img = cv2.medianBlur(img, 3)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    print(img.shape)
-
-    # output_frame | background gray and circles color
-    cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-    # https://docs.opencv.org/2.4/modules/imgproc/doc/feature_detection.html?highlight=houghcircles
-    # param1 | In case of CV_HOUGH_GRADIENT , it is the higher threshold of the two passed to the
-    #   Canny() edge detector (the lower one is twice smaller)
-    # param2 | In case of CV_HOUGH_GRADIENT , it is the accumulator threshold for the circle centers at the detection stage.
-    #  The smaller it is, the more false circles may be detected.
-    # dp – Inverse ratio of the accumulator resolution to the image resolution. For example,
-    # If dp=1 , the accumulator has the same resolution as the input image.
-    # If dp=2 , the accumulator has half as big width and height.
-    # return type | type(circles) | if no circles detected > 'NoneType', if circles detected > 'numpy.ndarray'
-
-    # method = cv2.HOUGH_GRADIENT
-    # dp = 1
-    # minDist = 1
-    # param1 = 75
-    # param2 = 95
-    # minRadius = int((img.shape[1] / 5 )/ 2)
-    # maxRadius = int(math.sqrt((((img.shape[0] / 2) * (img.shape[0] / 2)) + ((img.shape[1] / 2) * (img.shape[1] / 2)))))
-
-    method = cv2.HOUGH_GRADIENT
-    dp = 1
-    minDist = 10
-    param1 = 75
-    param2 = 80
-    minRadius = int((img.shape[1] / 3 )/ 2)
-    maxRadius = int(math.sqrt((((img.shape[0] / 2) * (img.shape[0] / 2)) + ((img.shape[1] / 2) * (img.shape[1] / 2)))))
-
-    print(minRadius,maxRadius)
-
-    circles = cv2.HoughCircles(
-        img, method=method, dp=dp, minDist=minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
-    # img, method=cv2.HOUGH_GRADIENT, dp=1, minDist=5, param1=75, param2=50, minRadius=50, maxRadius=120)
-
-    if type(circles) is np.ndarray:
-        # https://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html
-        # np.around() > EVENLY round to the given number of decimals.
-        # np.unit16 > Unsigned integer (0 to 65535) | casting
-        circles = np.uint16(np.around(circles))
-
-        for i in circles[0, :]:
-            # https://docs.opencv.org/2.4/modules/core/doc/drawing_functions.htmlq
-            # cv.Circle(img, center, radius, color, thickness=1, lineType=8, shift=0)
-
-            # draw the outer circle
-            cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 1)
-            # draw the center of the circle
-            cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
-
-    # save image
-    same_img=False
-    if (same_img):
-        save_name = "method=" + str(method) + "_dp=" + str(dp) + "_minDist=" + str(minDist) + "_param1=" + str(param1) + "_param2=" + str(param2) + "_minRadius=" + str(minRadius) + "_maxRadius" + str(maxRadius)
-        save_as = '/Users/harinsamaranayake/Desktop/' + save_name + '.png'
-        cv2.imwrite(save_as, cimg)
-
-    # if (flag == 0):
-    #     # single image
-    #     cv2.imshow('hough_circles', cimg)
-    #     cv2.waitKey(0)
-    #     cv2.destroyAllWindows()
-
-    return original, cimg, cimg, cimg
 
 def display_image_v1(flag=0, frame=None, resize_factor=2):
     # hough circles
@@ -435,8 +357,90 @@ def display_image_m3_kde(flag=0, frame=None,resize_factor=2):
         # video
         return original, cimg_map, cimg_map_norm, heat_map
 
+def display_image_v1_1(frame=None, resize_factor=None):
+    # this algorithm is designed for 540,960 resolution of the frame
+
+    img = None
+    cimg = None
+    original = None
+    resize_factor = resize_factor
+    img = frame
+
+    img = cv2.resize(img, (int(img.shape[1]/resize_factor), int(img.shape[0]/resize_factor)))
+    original = img.copy()
+
+    img = cv2.medianBlur(img, 3)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    print(img.shape)
+
+    # output_frame | background gray and circles color
+    cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+    # https://docs.opencv.org/2.4/modules/imgproc/doc/feature_detection.html?highlight=houghcircles
+    # param1 | In case of CV_HOUGH_GRADIENT , it is the higher threshold of the two passed to the
+    #   Canny() edge detector (the lower one is twice smaller)
+    # param2 | In case of CV_HOUGH_GRADIENT , it is the accumulator threshold for the circle centers at the detection stage.
+    #  The smaller it is, the more false circles may be detected.
+    # dp – Inverse ratio of the accumulator resolution to the image resolution. For example,
+    # If dp=1 , the accumulator has the same resolution as the input image.
+    # If dp=2 , the accumulator has half as big width and height.
+    # return type | type(circles) | if no circles detected > 'NoneType', if circles detected > 'numpy.ndarray'
+
+    # method = cv2.HOUGH_GRADIENT
+    # dp = 1
+    # minDist = 1
+    # param1 = 75
+    # param2 = 95
+    # minRadius = int((img.shape[1] / 5 )/ 2)
+    # maxRadius = int(math.sqrt((((img.shape[0] / 2) * (img.shape[0] / 2)) + ((img.shape[1] / 2) * (img.shape[1] / 2)))))
+
+    method = cv2.HOUGH_GRADIENT
+    dp = 1
+    minDist = 10
+    param1 = 75
+    param2 = 80
+    minRadius = int((img.shape[1] / 3 )/ 2)
+    maxRadius = int(math.sqrt((((img.shape[0] / 2) * (img.shape[0] / 2)) + ((img.shape[1] / 2) * (img.shape[1] / 2)))))
+
+    print(minRadius,maxRadius)
+
+    circles = cv2.HoughCircles(
+        # img, method=method, dp=dp, minDist=minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
+    img, method=cv2.HOUGH_GRADIENT, dp=1, minDist=1, param1=80, param2=50, minRadius=50, maxRadius=120)
+
+    if type(circles) is np.ndarray:
+        # https://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html
+        # np.around() > EVENLY round to the given number of decimals.
+        # np.unit16 > Unsigned integer (0 to 65535) | casting
+        circles = np.uint16(np.around(circles))
+
+        for i in circles[0, :]:
+            # https://docs.opencv.org/2.4/modules/core/doc/drawing_functions.htmlq
+            # cv.Circle(img, center, radius, color, thickness=1, lineType=8, shift=0)
+
+            # draw the outer circle
+            cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 1)
+            # draw the center of the circle
+            cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
+
+    # save image
+    same_img=False
+    if (same_img):
+        save_name = "method=" + str(method) + "_dp=" + str(dp) + "_minDist=" + str(minDist) + "_param1=" + str(param1) + "_param2=" + str(param2) + "_minRadius=" + str(minRadius) + "_maxRadius" + str(maxRadius)
+        save_as = '/Users/harinsamaranayake/Desktop/' + save_name + '.png'
+        cv2.imwrite(save_as, cimg)
+
+    # if (flag == 0):
+    #     # single image
+    #     cv2.imshow('hough_circles', cimg)
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
+
+    return original, cimg, cimg, cimg
+
 def display_video(video_path=None, seconds_to_skip=0):
     cap = cv2.VideoCapture(video_path, 0)
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
 
     # skip_frames(cap=cap,seconds_to_skip=seconds_to_skip)
 
@@ -447,11 +451,12 @@ def display_video(video_path=None, seconds_to_skip=0):
             img, cimg_map, cimg_map_norm, heat_map = display_image_v1_1(frame,2)
 
             # TYPE of frame to be saved as the video
-            frame_array.append(heat_map)
+            frame_array.append(cimg_map)
 
             # display video
             cv2.imshow('input', img)
             cv2.imshow('cimg_map_maen', cimg_map)
+            
             # cv2.imshow('cimg_map_norm', cimg_map_norm)
             # cv2.imshow('heat_map', heat_map)
             # cv2.waitKey(0)
@@ -468,27 +473,43 @@ def display_video(video_path=None, seconds_to_skip=0):
         else:
             break
 
-        # break
-
     cv2.destroyAllWindows()
 
+    return frame_array,fps
+
 if __name__ == "__main__":
+    #.....mavic_mini_stable/stable_water/1_2_m.....
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/1_2_m/"
+    video_name = "DJI_1580646956000"
+    video_format = ".MP4"
+
+    #.....mavic_mini_stable/stable_water/1_2_m_only_water.....
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/1_2_m_only_water/"
+    video_name = "DJI_0113"
+    video_format = ".MP4"
+
     #.....mavic_mini_stable/stable_water/2_4_m.....
-    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/mavic_mini/mavic_mini_stable/stable_water/2_4_m/"
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/2_4_m/"
     video_name = "DJI_0112"
     video_format = ".MP4"
 
-    #.....mavic_mini_stable/stable_water/1_2_m/only_water.....
-    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/mavic_mini/mavic_mini_stable/stable_water/1_2_m/only_water/"
-    video_name = "DJI_0113"
+    #.....mavic_mini_stable/stable_water/2_4_m_only_water.....
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/2_4_m_only_water/"
+    video_name = "DJI_0112"
     video_format = ".MP4"
+
+    #.....Phantom.....
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/phantom/down/non_rain/"
+    # video_name = "DJI_0004"
+    # video_format = ".MOV"
     
+    video_format_save_as = ".MP4"
     video = video_path + video_name + video_format
-    result_video_save_as = video_path + "result_" + video_name + video_format
+    result_video_save_as = video_path + "result_HC_" + video_name + video_format_save_as
     result_image_save_as = video_path
     
-    display_video(video_path=video, seconds_to_skip=0)
-    # save_video()
+    frame_array, fps = display_video(video_path=video, seconds_to_skip=0)
+    # save_video(frame_array,fps = fps ,save_path = result_video_save_as)
 
     # img_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_02/set_02_color/DJI_0004_00000000.png"
     # display_image_m3_kde(flag=0)

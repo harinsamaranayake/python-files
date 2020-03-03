@@ -160,6 +160,8 @@ def save_video(frame_array=None, fps=0, save_path=None):
 
     out.release()
 
+    print("\nVideo Saved")
+
 def display_text_on_frame(frame = None):
     frame = frame
 
@@ -822,7 +824,7 @@ def view_dense_potical_flow_static(video_path=None,seconds_to_skip=0,resize_fact
         # https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
         # angleInDegrees 0-radians 1-degrees
         mag, ang = cv2.cartToPolar(x=flow[...,0], y=flow[...,1], angleInDegrees=1)
-        print('\nmag',mag.shape,np.amin(mag),np.amax(mag),'\tang',ang.shape,np.amin(ang),np.amax(ang))
+        print('\nmag',mag.shape,np.amin(mag),np.amax(mag),'\tang',ang.shape,np.amin(ang),np.amax(ang),'\tframe',frame2.shape)
         
         mag_water_only = mag.copy()
         ang_water_only = ang.copy()
@@ -857,8 +859,6 @@ def view_dense_potical_flow_static(video_path=None,seconds_to_skip=0,resize_fact
 
         bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
 
-        frame_array.append(bgr)
-
         #.....Water Only.....
         ang_water_only[(0 <= ang_water_only) & (ang_water_only <= 360)] = 130
 
@@ -871,6 +871,10 @@ def view_dense_potical_flow_static(video_path=None,seconds_to_skip=0,resize_fact
         hsv_water_only[...,2] = cv2.normalize(mag_water_only,None,0,255,cv2.NORM_MINMAX)
 
         bgr_water_only = cv2.cvtColor(hsv_water_only,cv2.COLOR_HSV2BGR)
+
+        #.....Save Video.....
+        frame_array.append(bgr)
+        # frame_array.append(bgr_water_only)
 
         #.....Binning......
         # freq_ang, bins_ang = np.histogram(ang, bins = [0,1,32,64,96,128,160,192,224,256])
@@ -885,9 +889,9 @@ def view_dense_potical_flow_static(video_path=None,seconds_to_skip=0,resize_fact
         #     display_text_on_frame(frame2)
 
         #.....Show......
-        cv2.imshow('original frame',frame2)
-        cv2.imshow('8-directions',bgr)
-        cv2.imshow('water_only',bgr_water_only)
+        # cv2.imshow('original frame',frame2)
+        # cv2.imshow('8-directions',bgr)
+        # cv2.imshow('water_only',bgr_water_only)
 
         #.....Save......
         if (frame_no%10 == 0):
@@ -895,8 +899,10 @@ def view_dense_potical_flow_static(video_path=None,seconds_to_skip=0,resize_fact
             save_path_pred = save_path + "/PRED/IMG_" + video_name + "_" + str(frame_no) + ".png"
             print(save_path_org)
             print(save_path_pred)
-            # cv2.imwrite('/Users/harinsamaranayake/Documents/org.png',frame2)
-            # cv2.imwrite('/Users/harinsamaranayake/Documents/seg.png',seg_img)
+            cv2.imwrite('/Users/harinsamaranayake/Documents/org.png',frame2)
+            cv2.imwrite('/Users/harinsamaranayake/Documents/seg.png',bgr)
+            cv2.imwrite('/Users/harinsamaranayake/Documents/water.png',bgr_water_only)
+            break
 
         prvs = next
 
@@ -936,6 +942,10 @@ def view_dense_potical_flow_horizontal(video_path=None,seconds_to_skip=0,resize_
 
     while(1):
         ret, frame2 = cap.read()
+
+        if(not ret):
+            break
+
         frame_no += 1
 
         # if(not ((frame_no%59==0) or (frame_no%60==0) or (frame_no%61==0))):
@@ -975,17 +985,15 @@ def view_dense_potical_flow_horizontal(video_path=None,seconds_to_skip=0,resize_
 
         # .....Color Conversion.....
         # If red channel has a value that pixel is made black
-        # bgr[...,0] = 234
-        # bgr[...,1] = 207
-        # bgr[...,0][bgr[...,2] > 0] = 0
-        # bgr[...,1][bgr[...,2] > 0] = 0
-        # bgr[...,2][bgr[...,2] > 0] = 0
-
-        frame_array.append(bgr)
+        bgr[...,0] = 234
+        bgr[...,1] = 207
+        bgr[...,0][bgr[...,2] > 0] = 0
+        bgr[...,1][bgr[...,2] > 0] = 0
+        bgr[...,2][bgr[...,2] > 0] = 0
 
         # .....Show Image.....
-        cv2.imshow('original frame',frame2)
-        cv2.imshow('bgr',bgr)
+        # cv2.imshow('original frame',frame2)
+        # cv2.imshow('bgr',bgr)
 
         # .....Save Image.....
         if (frame_no%120 == 0):
@@ -995,6 +1003,9 @@ def view_dense_potical_flow_horizontal(video_path=None,seconds_to_skip=0,resize_
             print(save_path_pred)
             # cv2.imwrite(save_path_org,frame2)
             # cv2.imwrite(save_path_pred,seg_img)
+
+        # .....Save Video.....
+        frame_array.append(bgr)
 
         prvs = next
 
@@ -1015,51 +1026,86 @@ if __name__ == "__main__":
 
     #..........Hodizontal..........
 
-    # #.....Horizontal Moving 20_50 .....
-    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/mavic_mini/mavic_mini_horizontal_moving/20_50_m/"
-    # # video_name = "DJI_0181"
-    # # video_name = "DJI_0178"
+    # #.....Horizontal Moving 2_5 .....
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_horizontal_moving/2_5_m/"
+    # video_name = "DJI_0183"
     # video_format = ".MP4"
 
+    # #.....Horizontal Moving 5_10 .....
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_horizontal_moving/5_10m/"
+    # video_name = "DJI_0174"
+    # video_format = ".MP4"
+
+    # #.....Horizontal Moving 10_20 .....
+    # # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_horizontal_moving/10_20_m/"
+    # # video_name = "DJI_0176"
+    # # video_format = ".MP4"
+
+    # #.....Horizontal Moving 20_50 .....
+    # # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_horizontal_moving/20_50_m/"
+    # # video_name = "DJI_0179"
+    # # video_format = ".MP4"
+
+    # # #.....Phantom.....
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/phantom/down/non_rain/"
+    # video_name = "DJI_0005"
+    # video_format = ".MOV"
+    # mag_thresh = 0.5
+
+
+    # video_format_save_as = ".MP4"
     # video = video_path + video_name + video_format
-    # result_video_save_as = video_path + "result_" + video_name + video_format
+    # result_video_save_as = video_path + "result_w_" + video_name + video_format_save_as
     # result_image_save_as = video_path
 
-    # frame_array, fps, mag_max, mag_min = view_dense_potical_flow_horizontal(video_path=video,seconds_to_skip=0,resize_factor=4,save_path = result_image_save_as)
+    # frame_array, fps, mag_max, mag_min = view_dense_potical_flow_horizontal(video_path=video,seconds_to_skip=0,resize_factor=2,save_path = result_image_save_as)
 
     # save_video(frame_array,fps = fps ,save_path = result_video_save_as)
 
     #..........Static..........
 
-    #.....Static Water 1_2 .....
-    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/mavic_mini/mavic_mini_stable/stable_water/1_2_m/only_water/"
-    # video_name = "DJI_0136"
-    video_name = "DJI_0113"
+    #.....mavic_mini_stable/stable_water/1_2_m.....
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/1_2_m/"
+    video_name = "DJI_1580645304000"
     video_format = ".MP4"
     mag_thresh = 1.0
 
-    #.....Non Water.....
-    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/mavic_mini/mavic_mini_stable/non_water/0_2/"
-    # video_name = "DJI_0136"
-    # video_name = "DJI_0137"
-    # video_name = "DJI_0138"
-    # video_name = "DJI_0161"
-    # video_name = "DJI_0162"
-    video_name = "DJI_0163"
+    # .....mavic_mini_stable/stable_water/1_2_m_only_water.....
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/1_2_m_only_water/"
+    # video_name = "DJI_0184"
+    # video_format = ".MP4"
+    # mag_thresh = 1.0
+
+    # .....mavic_mini/mavic_mini_stable/non_water/0_2.....
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/non_water/0_2/"
+    # video_name = "DJI_0163"
+    # video_format = ".MP4"
+    # mag_thresh = 1.0
+
+    #.....mavic_mini_stable/stable_water/2_4_m.....NA
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/2_4_m/"
+    # video_name = "DJI_0116"
+    # video_format = ".MP4"
+    # mag_thresh = 1.0
+
+    #.....mavic_mini_stable/stable_water/2_4_m_only_water.....NA
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water/2_4_m_only_water/"
+    video_name = "DJI_0115"
     video_format = ".MP4"
-    mag_thresh = 1.0
+    mag_thresh = 0.5
 
     #.....Phantom.....
-    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/phantom/down/"
-    video_name = "DJI_0004"
-    video_format = ".MOV"
-    mag_thresh = 0.5
+    # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/phantom/down/non_rain/"
+    # video_name = "DJI_0004"
+    # video_format = ".MOV"
+    # mag_thresh = 0.5
     
+    video_format_save_as = ".MP4"
     video = video_path + video_name + video_format
-    result_video_save_as = video_path + "result_" + video_name + video_format
+    result_video_save_as = video_path + "result_wd_" + video_name + video_format_save_as
     result_image_save_as = video_path
 
     frame_array, fps, mag_max, mag_min = view_dense_potical_flow_static(video_path=video,seconds_to_skip=0,resize_factor=2,save_path = result_image_save_as, mag_thresh=mag_thresh)
-    
+
     # save_video(frame_array,fps = fps ,save_path = result_video_save_as)
 

@@ -10,7 +10,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report
 
 #### CHANGE
-flag_resize_pred=True
+flag_resize_pred = None
 # path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_000_029_ep100'
 # path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/crop/label'
 # path_pred = '/Users/harinsamaranayake/Documents/Research/UNET/unet-master-puddle-data/data/membrane/pred_301_330_ep100'
@@ -92,7 +92,7 @@ def read_from_file():
 def read_from_folder(path_true = None , path_pred = None):
     print('\n..........read_from_folder..........\n')
 
-    flag_resize_pred=True
+    flag_resize_pred=False
 
     true_img_list = []
     pred_img_list = []
@@ -158,6 +158,9 @@ def read_from_folder(path_true = None , path_pred = None):
         
         true_img_list.append(true_img)
         pred_img_list.append(pred_img)
+
+    print('true_img',true_img.shape)
+    print('pred_img',pred_img.shape)
 
     #converting to numpy arrays
     true_list_new = np.array(true_img_list)
@@ -273,11 +276,12 @@ def scikit_metrix(true_list_new = None,pred_list_new = None):
     print('Classification Report: \n', classification_report(y_true=y_true, y_pred=y_pred))
 
 if __name__ == '__main__':
-    path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/on_road_test_mask'
-    path_pred = '/Users/harinsamaranayake/Desktop/Results_Latest/unet-master-new-256/RESULTS/EP100/ONR/'
+    # path_true = '/Users/harinsamaranayake/Documents/Research/Datasets/FCN8s/split/both_road_test_mask'
+    path_true = '/Users/harinsamaranayake/Desktop/simplified/data/OFR/test/label'
+    path_pred = '/Users/harinsamaranayake/Downloads/OFR'
 
     true_list_new,pred_list_new = read_from_folder(path_true = path_true , path_pred = path_pred)
-    confusion_metrics_method_01(true_list_new = true_list_new,pred_list_new = pred_list_new)
+    # confusion_metrics_method_01(true_list_new = true_list_new,pred_list_new = pred_list_new)
     scikit_metrix(true_list_new = true_list_new,pred_list_new = pred_list_new)
     # list_value_finder()
     pass

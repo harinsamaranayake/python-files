@@ -1,31 +1,55 @@
 import cv2
-read_path="/Users/harinsamaranayake/Documents/Research/Datasets/drone_videos/"
-write_path="/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/video2frames/"
-video_name="DJI_0004"
-video_extention=".MOV"
-image_format=".png"
+import os
 
-# read_path="/Users/harinsamaranayake/Documents/Research/Datasets/car_videos/02/"
-# write_path="/Users/harinsamaranayake/Documents/Research/Datasets/car_images/"
-# video_name="MVI_3165"
-# video_extention=".MP4"
-# image_format=".png"
+read_path="/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/stable_water_with_plants/2_4/"
 
+# prefix = "drone_f_"
+# prefix = "drone_h_"
+prefix = "drone_s_swwp_2_4_"
 
-vidcap = cv2.VideoCapture(read_path+video_name+video_extention)
-success, image = vidcap.read()
-frame_count = 0
-write_count = 0
+if not os.path.exists(read_path + "image"):
+    try:
+        os.makedirs(read_path + "image")
+    except FileExistsError:
+        print("Folder Exists")
+        pass
 
-while success:
-    if(frame_count % 60 == 0):
-        # save frame
-        print(write_path+"car_"+video_name+("_%s"% str(frame_count).zfill(8))+image_format )
-        cv2.imwrite(write_path+"car_"+video_name+("_%s"% str(frame_count).zfill(8))+image_format, image)
-        write_count += 1
+if not os.path.exists(read_path + "label"):
+    try:
+        os.makedirs(read_path + "label")
+    except FileExistsError:
+        print("Folder Exists")
+        pass
+
+read_list = next(os.walk(read_path))[2]
+
+for video in read_list:
+    name = video.split(".")
+    video_name = name[0]
+    video_extention = "." + name[1]
+    print(name[0],name[1])
+
+    write_path= read_path + "image/"
+    image_format=".png"
+
+    interval = 60
+
+    vidcap = cv2.VideoCapture(read_path+video_name+video_extention)
     success, image = vidcap.read()
-    # print('Read a new frame:%d ' % frame_count, success, 'Wrote frame:', write_count)
-    frame_count += 1
-    # break
+    frame_count = 0
+    write_count = 0
 
-print("Write Count > ",write_count)
+    while success:
+        if(frame_count % interval == 0):
+            # ......save frame......
+
+            print(write_path + prefix + video_name + ("_%s"% str(frame_count).zfill(8))+image_format)
+            cv2.imwrite(write_path + prefix + video_name + ("_%s"% str(frame_count).zfill(8))+image_format, image)
+
+
+            print('Wrote frame:', write_count)
+            write_count += 1
+        success, image = vidcap.read()
+        frame_count += 1
+
+    print("Write Count > ",write_count)
