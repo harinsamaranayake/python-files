@@ -1,3 +1,10 @@
+# Author    :: Harin Samaranayake
+# Note      :: Read videos in a folder, and save frames with a given interval
+# read_path         - Folder with videos | should specify
+# image_save_path   - read_path/images
+# label_save_path   - read_path/label  :: Extra
+# prefix            - save image prefix
+
 import cv2
 import os
 
@@ -33,22 +40,23 @@ for video in read_list:
     image_format=".png"
 
     interval = 60
-
-    vidcap = cv2.VideoCapture(read_path+video_name+video_extention)
-    success, image = vidcap.read()
     frame_count = 0
     write_count = 0
 
-    while success:
-        if(frame_count % interval == 0):
-            # ......save frame......
+    vidcap = cv2.VideoCapture(read_path+video_name+video_extention)
+    success, image = vidcap.read()
 
+    while success:
+        if (frame_count % interval == 0):
+            
+            # ......save frame......
             print(write_path + prefix + video_name + ("_%s"% str(frame_count).zfill(8))+image_format)
             cv2.imwrite(write_path + prefix + video_name + ("_%s"% str(frame_count).zfill(8))+image_format, image)
 
 
             print('Wrote frame:', write_count)
             write_count += 1
+            
         success, image = vidcap.read()
         frame_count += 1
 

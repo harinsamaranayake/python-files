@@ -8,18 +8,21 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import scipy.stats as st
 import cv2
 
-img_name = "DJI_0004_00000000"
+img_name = "Picture 5"
 # img_name = "DJI_0004_00000300"
 # img_name = "DJI_0004_00000600"
 # img_name = "DJI_0004_00000900"
 img_extention = ".png"
-img_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_03_down/" + img_name + img_extention
+img_path = "/Users/harinsamaranayake/Desktop/" + img_name + img_extention
 
 write_path_1 = "/Users/harinsamaranayake/Desktop/" + img_name + "_" + "original" + img_extention
 write_path_2 = "/Users/harinsamaranayake/Desktop/" + img_name + "_" + "circles" + img_extention
 write_path_3 = "/Users/harinsamaranayake/Desktop/" + img_name + "_" + "centers" + img_extention
 write_path_4 = "/Users/harinsamaranayake/Desktop/" + img_name + "_" + "kde_2D" + img_extention
 write_path_5 = "/Users/harinsamaranayake/Desktop/" + img_name + "_" + "kde_3D" + img_extention
+
+
+print(img_path)
 
 img = cv2.imread(img_path, 1)
 img = cv2.resize(img, (int(img.shape[1]/2), int(img.shape[0]/2)))
@@ -140,8 +143,8 @@ plt.show()
 # cv2.imshow('img_copy',img_copy)
 # cv2.imshow('cimg_outer',cimg_outer)
 # cv2.imshow('cimg_inner',cimg_inner)
-# cv2.waitKey(0)
+cv2.waitKey(0)
 
-# cv2.imwrite(write_path_1, img_copy)
-# cv2.imwrite(write_path_2, cimg_outer)
-# cv2.imwrite(write_path_3, cimg_inner)
+cv2.imwrite(write_path_1, img_copy)
+cv2.imwrite(write_path_2, cimg_outer)
+cv2.imwrite(write_path_3, cimg_inner)

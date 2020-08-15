@@ -1,7 +1,9 @@
 import numpy as np
 import cv2
 
-cap = cv2.VideoCapture('DJI_0004.MOV') #'DJI_0004.MOV''DJI_0011.MOV'
+video_path = 'path/video_name.extention'
+
+cap = cv2.VideoCapture(video_path)
 
 while(True):
     # Capture frame-by-frame
@@ -40,6 +42,8 @@ while(True):
     # Display the resulting frame
     output_img=cv2.resize(output_img, (960, 540))
     cv2.imshow('output_img',output_img)
+
+    
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 

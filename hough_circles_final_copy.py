@@ -285,7 +285,7 @@ def display_image_m2(flag=0, frame=None):
     return original, cimg_map, cimg_map_norm, heat_map
 
 def display_image_m3_kde(flag=0, frame=None,resize_factor=2):
-    # flag 0 - read image from path, flag 1 - read passed image
+    # flag 0 - read image from path, flag 1 - get the passed frame
     original = None
     img = None
     cimg = None
@@ -307,11 +307,24 @@ def display_image_m3_kde(flag=0, frame=None,resize_factor=2):
     original = img
     img = cv2.medianBlur(img, 3)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    # cimg = img
+    cimg = original
+
+    # cv2.imshow('gray', img)
+    # cv2.waitKey(0)
 
     circles = cv2.HoughCircles(
         img, method=cv2.HOUGH_GRADIENT, dp=1, minDist=5, param1=75, param2=30, minRadius=60, maxRadius=100)
     # img, method=cv2.HOUGH_GRADIENT, dp=1, minDist=5, param1=75, param2=30, minRadius=40, maxRadius=100)
+
+    # draw circles
+    for i in circles[0, :]:
+            # draw the outer circle
+            # cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 1)
+            # draw the center of the circle
+            cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
+    
+    cv2.imshow('cimg', cimg)
+    cv2.waitKey(0)
 
     if type(circles) is np.ndarray:
         # np.around() > EVENLY round to the given number of decimals.
@@ -320,7 +333,7 @@ def display_image_m3_kde(flag=0, frame=None,resize_factor=2):
         circles_xyr = circles[0, :]
         circles_xy = circles_xyr[:, 0:2]
 
-        print(circles_xy)
+        # print(circles_xy)
 
         # for i in circles[0, :]:
         #     # print('x:\t',i[0],'\ty:\t',i[1],'\tr:\t',i[2])
@@ -396,10 +409,10 @@ def display_image_v1_1(frame=None, resize_factor=None):
 
     method = cv2.HOUGH_GRADIENT
     dp = 1
-    minDist = 10
+    minDist = 1
     param1 = 75
-    param2 = 80
-    minRadius = int((img.shape[1] / 3 )/ 2)
+    param2 = 90
+    minRadius = int((img.shape[1] / 5 )/ 2)
     maxRadius = int(math.sqrt((((img.shape[0] / 2) * (img.shape[0] / 2)) + ((img.shape[1] / 2) * (img.shape[1] / 2)))))
 
     print(minRadius,maxRadius)
@@ -407,6 +420,13 @@ def display_image_v1_1(frame=None, resize_factor=None):
     circles = cv2.HoughCircles(
         # img, method=method, dp=dp, minDist=minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
     img, method=cv2.HOUGH_GRADIENT, dp=1, minDist=1, param1=80, param2=50, minRadius=50, maxRadius=120)
+
+    method = cv2.HOUGH_GRADIENT
+    minRadius = int((img.shape[1] / 5) / 2)
+    maxRadius = int(math.sqrt(
+        (((img.shape[0] / 2) * (img.shape[0] / 2)) + ((img.shape[1] / 2) * (img.shape[1] / 2)))))
+    circles = cv2.HoughCircles(
+        img, method, dp, minDist, param1, param2, minRadius, maxRadius)
 
     if type(circles) is np.ndarray:
         # https://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html
@@ -448,7 +468,8 @@ def display_video(video_path=None, seconds_to_skip=0):
         ret, frame = cap.read()
 
         if ret:
-            img, cimg_map, cimg_map_norm, heat_map = display_image_v1_1(frame,2)
+            # img, cimg_map, cimg_map_norm, heat_map = display_image_v1_1(frame, 2)
+            img, cimg_map, cimg_map_norm, heat_map = display_image_m3_kde(frame, 2)
 
             # TYPE of frame to be saved as the video
             frame_array.append(cimg_map)
@@ -462,16 +483,18 @@ def display_video(video_path=None, seconds_to_skip=0):
             # cv2.waitKey(0)
 
             # .....save the images......
-            # cv2.imwrite('/Users/harinsamaranayake/Desktop/original.png',img)
-            # cv2.imwrite('/Users/harinsamaranayake/Desktop/cimg_map_mean.png',cimg_map)
-            # cv2.imwrite('/Users/harinsamaranayake/Desktop/cimg_map_mean_norm.png',cimg_map_norm)
-            # cv2.imwrite('/Users/harinsamaranayake/Desktop/heat_map.png',heat_map)
+            cv2.imwrite('/Users/harinsamaranayake/Desktop/original.png',img)
+            cv2.imwrite('/Users/harinsamaranayake/Desktop/cimg_map_mean.png',cimg_map)
+            cv2.imwrite('/Users/harinsamaranayake/Desktop/cimg_map_mean_norm.png',cimg_map_norm)
+            cv2.imwrite('/Users/harinsamaranayake/Desktop/heat_map.png',heat_map)
 
             # cv2.waitKey(x) , x=1 delay 1 miliseconds , x=0|infinite dealy
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         else:
             break
+
+        break
 
     cv2.destroyAllWindows()
 
@@ -498,6 +521,10 @@ if __name__ == "__main__":
     video_name = "DJI_0112"
     video_format = ".MP4"
 
+    video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/mavic_mini/mavic_mini_stable/non_water/0_2/"
+    video_name = "DJI_0163"
+    video_format = ".MP4"
+
     #.....Phantom.....
     # video_path = "/Users/harinsamaranayake/Documents/Research/Datasets/new_drone_videos/phantom/down/non_rain/"
     # video_name = "DJI_0004"
@@ -508,10 +535,10 @@ if __name__ == "__main__":
     result_video_save_as = video_path + "result_HC_" + video_name + video_format_save_as
     result_image_save_as = video_path
     
-    frame_array, fps = display_video(video_path=video, seconds_to_skip=0)
+    # frame_array, fps = display_video(video_path=video, seconds_to_skip=0)
     # save_video(frame_array,fps = fps ,save_path = result_video_save_as)
 
-    # img_path = "/Users/harinsamaranayake/Documents/Research/Datasets/drone_images/set_02/set_02_color/DJI_0004_00000000.png"
-    # display_image_m3_kde(flag=0)
+    img_path = "/Users/harinsamaranayake/Desktop/Picture 1.png"
+    display_image_m3_kde(0,img_path,2)
 
     print('\n.....Process Completed!.....')
